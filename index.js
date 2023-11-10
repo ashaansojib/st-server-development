@@ -12,17 +12,18 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSNAME}@cluster0.ig4lnta.mongodb.net/?retryWrites=true&w=majority`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
     try {
         const customerLists = client.db('sujon-telecom').collection('customers');
-        const productList = client.db('sujon-telecom').collection('products')
+        const productList = client.db('sujon-telecom').collection('products');
+        const loginUsers = client.db('st-login-users').collection('users');
         // customers api
         app.get('/customer-list', async (req, res) => {
             const query = await customerLists.find().toArray();
@@ -56,6 +57,20 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) };
             const result = await productList.deleteOne(query);
+            res.send(result);
+        });
+        // login users handle
+        app.get('/login-users', async (req, res) => {
+            const result = await loginUsers.find().toArray();
+            res.send(result);
+        });
+        app.post('/store-users', async (req, res) => {
+            const user = req.body;
+            const existUser = { email: user.email }
+            if(existUser){
+                res.send("User Already Added!")
+            }
+            const result = await loginUsers.insertOne(user);
             res.send(result);
         });
         // Connect the client to the server	(optional starting in v4.7)
