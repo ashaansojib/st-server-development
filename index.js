@@ -66,9 +66,9 @@ async function run() {
         });
         app.post('/store-users', async (req, res) => {
             const user = req.body;
-            const existUser = { email: user.email }
-            if(existUser){
-                res.send("User Already Added!")
+            const existUser = await loginUsers.findOne({ email: user.email });
+            if (existUser) {
+                return res.send("User Already Added!")
             }
             const result = await loginUsers.insertOne(user);
             res.send(result);
