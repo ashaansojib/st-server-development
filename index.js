@@ -76,19 +76,13 @@ async function run() {
         app.patch('/update-user-role/:id', async (req, res) => {
             const id = req.params.id;
             const data = req.body;
-            console.log(id, data);
-            const query = { _id: new ObjectId(id) };
-            // Check if the user already has a role
-            const existingUser = await loginUsers.findOne(query);
-            if (!existingUser) {
-                return res.status(404).send({ error: 'User not found' });
-              }
-              // If the user already has a role, update it; otherwise, add the role
-              const updateInfo = {
-                role: existingUser.role ? data.role : 'admin',
-              };
-              const result = await loginUsers.updateOne(query, updateInfo);
-              res.send(result);
+            console.log(data)
+            const filter = { _id: new ObjectId(id) };
+            const updateInfo = {
+                $set: { role : data.role}
+            }
+            const result = await loginUsers.updateOne(filter, updateInfo);
+            res.send(result)
         });
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
